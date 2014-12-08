@@ -1,5 +1,8 @@
 package org.redpill.maven.alfresco;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
@@ -29,7 +32,17 @@ public class ActivateEnterpriseMojo extends AbstractMojo {
   private ArtifactHandlerManager artifactHandlerManager;
 
   public void execute() throws MojoExecutionException, MojoFailureException {
-    char incrementalVersion = _alfrescoVersion.charAt(4);
+    try {
+      executeInternal();
+    } catch (Exception ex) {
+      ex.printStackTrace();
+      
+      throw new MojoFailureException(ex.getMessage(), ex); 
+    }
+  }
+
+  private void executeInternal() {    
+    char incrementalVersion = _alfrescoVersion.charAt(_alfrescoVersion.length()-1);
     
     if (getLog().isInfoEnabled()) {
       getLog().info("Incremental version is: " + incrementalVersion);
@@ -48,14 +61,38 @@ public class ActivateEnterpriseMojo extends AbstractMojo {
         getLog().info(artifact1.toString());
         getLog().info(artifact2.toString());
       }
-
-      project.getDependencyArtifacts().add(artifact1);
-      project.getDependencyArtifacts().add(artifact2);
+      
+      Set<Artifact> dependencyArtifacts = project.getDependencyArtifacts();
+      Set<Artifact> deps = new HashSet<Artifact>();
+      deps.addAll(dependencyArtifacts);
+      deps.add(artifact1);
+      deps.add(artifact2);
+      project.setDependencyArtifacts(deps);
     } else {
       if (getLog().isInfoEnabled()) {
         getLog().info("Build is a community build, doing nothing...");
       }
     }
+  }
+  
+  public void setAlfrescoGroupId(String alfrescoGroupId) {
+    this._alfrescoGroupId = alfrescoGroupId;
+  }
+  
+  public String getAlfrescoGroupId() {
+    return _alfrescoGroupId;
+  }
+  
+  public void setAlfrescoVersion(String alfrescoVersion) {
+    this._alfrescoVersion = alfrescoVersion;
+  }
+  
+  public void setProject(MavenProject project) {
+    this.project = project;
+  }
+  
+  public void setArtifactHandlerManager(ArtifactHandlerManager artifactHandlerManager) {
+    this.artifactHandlerManager = artifactHandlerManager;
   }
 
 }
