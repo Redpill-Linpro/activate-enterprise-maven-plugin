@@ -41,8 +41,8 @@ public class ActivateEnterpriseMojo extends AbstractMojo {
     }
   }
 
-  private void executeInternal() {
-    char incrementalVersion = _alfrescoVersion.charAt(4);
+  private void executeInternal() {    
+    char incrementalVersion = _alfrescoVersion.charAt(_alfrescoVersion.length()-1);
     
     if (getLog().isInfoEnabled()) {
       getLog().info("Incremental version is: " + incrementalVersion);
@@ -73,6 +73,26 @@ public class ActivateEnterpriseMojo extends AbstractMojo {
         getLog().info("Build is a community build, doing nothing...");
       }
     }
+  }
+  
+  public void setAlfrescoGroupId(String alfrescoGroupId) {
+    this._alfrescoGroupId = alfrescoGroupId;
+  }
+  
+  public String getAlfrescoGroupId() {
+    return _alfrescoGroupId;
+  }
+  
+  public void setAlfrescoVersion(String alfrescoVersion) {
+    this._alfrescoVersion = alfrescoVersion;
+  }
+  
+  public void setProject(MavenProject project) {
+    this.project = project;
+  }
+  
+  public void setArtifactHandlerManager(ArtifactHandlerManager artifactHandlerManager) {
+    this.artifactHandlerManager = artifactHandlerManager;
   }
 
 }
